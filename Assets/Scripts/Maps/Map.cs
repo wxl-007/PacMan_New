@@ -11,6 +11,8 @@ public class Map : MonoBehaviour
      */
     // Use this for initialization
      const int m_column = 28, m_row = 31; 
+	 [HideInInspector] 
+	 public int[] bornPoint = {23,14};  
      int[,] originalMap = new int[31, 28] {
        // 1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8 
         {17,26,26,26,26,26,26,26,26,26,26,26,26,43,42,26,26,26,26,26,26,26,26,26,26,26,26,16},
@@ -52,7 +54,9 @@ public class Map : MonoBehaviour
 	public Sprite[] mapSprites; 
 	public Sprite smallPoint,bigPoint;
  
-
+	public int[,] mapArray{
+		get { return originalMap;}
+	}
 
     public void InitMap() {
 		if (this.gameObject != null) {
@@ -70,8 +74,10 @@ public class Map : MonoBehaviour
 					tPiece.transform.localScale = Vector3.one;
 
 					tPiece.transform.localPosition = new Vector3(j*47,i*(-47),0);
+					tPiece.name = "m_" + i + "_" + j;
 					if (currentMap [i, j] > 0) {
 						tPiece.GetComponent<Image>().sprite = mapSprites [currentMap [i, j]];
+
 					} else if (currentMap [i, j] == -1) {
 						// small point 
 						tPiece.GetComponent<Image> ().sprite = smallPoint;

@@ -38,7 +38,7 @@ public class UIController : MonoBehaviour {
 
 	void InitGame(){
 		m_MainCtrl.GetGameCtrl.gameObject.SetActive (true);
-		m_MainCtrl.GetGameCtrl.SetMap ();
+		m_MainCtrl.GetGameCtrl.InitGame ();
 		m_MainCtrl.HideMenu ();
 	}
 	void OnControlClick(){
