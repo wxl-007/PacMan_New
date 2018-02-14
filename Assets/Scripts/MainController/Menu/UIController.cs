@@ -17,18 +17,15 @@ public class UIController : MonoBehaviour {
 		btn_Control =mainPanel.transform.Find("Btn_Control");
 		btn_About = mainPanel.transform.Find("Btn_About");
 		if (btn_Start != null && btn_Control != null && btn_About != null) {
-			Debug.Log ("in here ");
 			// add listener 
 			btn_Start.GetComponent<Button>().onClick.AddListener(OnStartClick);
 			btn_Control.GetComponent<Button>().onClick.AddListener(OnControlClick);
 			btn_About.GetComponent<Button>().onClick.AddListener(OnAboutClick);
-		
 		}
 	}
 
 	// will add animation on the menu scene
 	void Animation(){
-	
 	
 	}
 
@@ -46,7 +43,6 @@ public class UIController : MonoBehaviour {
 	}
 	void OnAboutClick(){
 		Debug.Log ("click about btn");
-
 	}
 
 	void OnPointerEnter(PointerEventData pEventData){
