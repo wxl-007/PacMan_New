@@ -20,13 +20,16 @@ public class Pacman : MonoBehaviour {
 	public int WaitingDir{
 		get{ return (int)waitingDir;}
 	}
-	float speed = 4.5f;
+	Direction lastDir = Direction.non;
+	float speed = 4f;
 
 	//is super or not 
 	bool curState;
 	int timer =1;
 	bool willStop;
+	bool willTurn;
 	int[,] stopPos;
+	int[,] turnPos;
 	public void Init(){
 		curDir = Direction.Left;
 		curState = false;
@@ -36,24 +39,24 @@ public class Pacman : MonoBehaviour {
 		//stop first 
 		if (pDir == 5 && pPos!= null) {
 			willStop = true;
+			//curDir = Direction.non;
 			stopPos = pPos;
 			return;
 		}
-		if (pPos != null) {
-		
-		}
-		//oppsite direciton == 2 
 		if (Mathf.Abs ((int)curDir - pDir) != 2) {
 			// turn waiting list 
 			waitingDir = (Direction)pDir;
 
 		} else {
 			//directly change dont wait 
-			curDir =(Direction)pDir;
+			curDir = (Direction)pDir;
 			ChangeDirection ();
 		}
 	}
+
+	// change statuss
 	public void SetState(bool pState){
+		Debug.Log ("change state");
 		curState = pState;
 	}
 
@@ -76,33 +79,32 @@ public class Pacman : MonoBehaviour {
 		this.transform.localPosition = new Vector3 (pCurPos[0,0]*47,pCurPos[0,1]*(-47));
 	}
 
-	void Update(){
+	void FixedUpdate(){
 		//timer += Time.deltaTime;
-		if (Time.frameCount % 2 == 0) {
-			if (curDir == Direction.Left) {
-				this.gameObject.transform.localPosition += Vector3.left * speed;
-			} else if (curDir == Direction.Right) {
-				this.gameObject.transform.localPosition += Vector3.right * speed;
-			} else if (curDir == Direction.Up) {
-				this.gameObject.transform.localPosition += Vector3.up * speed;
-			} else if (curDir == Direction.Down) {
-				this.gameObject.transform.localPosition += Vector3.down * speed;
-			} else {
-				//stop
-			}
-			if (willStop == true) {
-				//Debug.Log ("dis  ==  bewteen "+this.transform.localPosition +" and  "+new Vector3(stopPos[0,0]*47,stopPos[0,1]*(-47),this.transform.localPosition.z)+    ";;;;"+   Vector3.Distance(this.gameObject.transform.localPosition,new Vector3(stopPos[0,0]*47,stopPos[0,1]*(-47),this.transform.localPosition.z)));
-				if(Vector3.Distance(this.gameObject.transform.localPosition,new Vector3(stopPos[0,0]*47,stopPos[0,1]*(-47),this.transform.localPosition.z)) <10.0){
-					OffsetPos (stopPos);
-					willStop = false;
-					curDir = Direction.non;
-					//turn to other dir 
-					if (waitingDir != Direction.non) {
-						Debug.Log (waitingDir);
-						curDir = waitingDir;
-						ChangeDirection ();
-						waitingDir = Direction.non;
-					}
+		if (curDir == Direction.Left) {
+			this.gameObject.transform.localPosition += Vector3.left * speed;
+		} else if (curDir == Direction.Right) {
+			this.gameObject.transform.localPosition += Vector3.right * speed;
+		} else if (curDir == Direction.Up) {
+			this.gameObject.transform.localPosition += Vector3.up * speed;
+		} else if (curDir == Direction.Down) {
+			this.gameObject.transform.localPosition += Vector3.down * speed;
+		} else {
+			
+		}
+	}
+	void Update(){
+		if (willStop == true) {
+			if (Vector3.Distance (this.gameObject.transform.localPosition, new Vector3 (stopPos [0, 0] * 47, stopPos [0, 1] * (-47), this.transform.localPosition.z)) < 8.0) {
+				OffsetPos (stopPos);
+				willStop = false;
+				curDir = Direction.non;
+				//turn to other dir 
+				if (waitingDir != Direction.non) {
+					//Debug.Log (waitingDir);
+					curDir = waitingDir;
+					ChangeDirection ();
+					waitingDir = Direction.non;
 				}
 			}
 		}

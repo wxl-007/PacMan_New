@@ -10,15 +10,21 @@ public class GameController : MonoBehaviour {
 	int curLiveNum =0;
 	int curLevel =1;
 	int curScore =0;
-	// Use this for initialization
+	// Use this for initialization and is 
 	int[,] mapArr;
 	int timer =0;
 	//[HideInInspector]
 	public GameObject pacmanObj;
 	Pacman PacCtrl; 
+	ScoreBoard scoreBoard;
+	Transform livesTran;
+
+
 	public void Init(Object pMainCtrl){
 		m_MainObj = (MainController)pMainCtrl;
 		m_Map = this.transform.Find ("Panel/MapParentObj").GetComponent<Map>();
+		scoreBoard = this.transform.Find ("Panel/Img_Score").GetComponent<ScoreBoard> ();
+		livesTran = this.transform.Find ("Panel/Img_Lives");
 	}
 
 
@@ -34,20 +40,21 @@ public class GameController : MonoBehaviour {
 		InitPacman ();
 	}
 
-	//
+	// init PacMan 
 	void InitPacman(){
 		pacmanObj.transform.SetParent ( m_Map.transform); 
 		pacmanObj.SetActive (true);
-		// <-
-
 		pacmanObj.transform.localEulerAngles = Vector3.zero;
 		pacmanObj.transform.localScale = Vector3.one;
 		pacmanObj.transform.localPosition = new Vector3(m_Map.bornPoint[1]*47,m_Map.bornPoint[0]*(-47),20)  ;
 		PacCtrl = pacmanObj.GetComponent<Pacman> ();
 		PacCtrl.Init ();
 	}
-	void CalculateScore(){
+	// count the score  
+	void CalculateScore(int pScore){
 		//count score and add lives
+		curScore += pScore;
+		scoreBoard.SetScore (curScore);
 	}
 	/// <summary>
 	///  locating where the object is in the matrix
@@ -64,8 +71,9 @@ public class GameController : MonoBehaviour {
 	/// <param name="pDirNum">P dir number.</param>
 	 public bool CanMove(GameObject pObj,int pDirNum){
 		int[,] tPos = Locator (pObj); 
-		//Debug.Log ("cur pos ("+tPos[0,0] + " ," + tPos[0,1]+")");
-		//Debug.Log ("map piece = " + mapArr [tPos [0, 1], tPos [0, 0]]);
+		if (pObj == pacmanObj) {
+			EatPacDots (tPos);
+		}
 		if (pDirNum == 1) {
 			//up  y-1 
 			if (mapArr [tPos [0, 1]-1, tPos [0, 0]] > 0)
@@ -74,7 +82,6 @@ public class GameController : MonoBehaviour {
 				return true;
 		} else if (pDirNum == 2) {
 			//left x-1
-			//Debug.Log ("map Left = " + mapArr [tPos [0, 1],tPos [0, 0]-1]);
 			if (mapArr [tPos [0, 1], tPos [0, 0]-1] > 0)
 				return false;
 			else
@@ -93,37 +100,49 @@ public class GameController : MonoBehaviour {
 				return true;
 		}
 		return false;
-	
+	}
+	//
+	void EatPacDots(int[,] pPos ){
+		
+		if (mapArr [pPos [0, 1], pPos [0, 0]] == -1) {
+			//eat pac-dots
+			// pac-dots = 10
+			CalculateScore (10);
+		} else if (mapArr [pPos [0, 1], pPos [0, 0]] == -2) {
+			//power pellet
+			// super mode
+			PacCtrl.SetState (true);
+			CalculateScore (50);
+		}
+		mapArr [pPos [0, 1], pPos [0, 0]] = 0;
+		m_Map.SetDotsHide (pPos);
 	}
 
 
+	void FixedUpdate(){
+		if (Input.GetKey (KeyCode.UpArrow)) {
+			// up
+			PacCtrl.SetDirection (1);
+		} else if (Input.GetKey (KeyCode.DownArrow)) {
+			PacCtrl.SetDirection (3);
+		} else if (Input.GetKey (KeyCode.LeftArrow)) {
+			PacCtrl.SetDirection (2);
+		} else if (Input.GetKey (KeyCode.RightArrow)) {
+			PacCtrl.SetDirection (4);
+		}
+	}
 	void Update(){
-
-			if (Input.GetKey (KeyCode.UpArrow)) {
-				// up
-				//if(CanMove(pacmanObj,1))
-				PacCtrl.SetDirection(1);
-			} else if (Input.GetKey (KeyCode.DownArrow)) {
-				//if(CanMove(pacmanObj,3))
-				PacCtrl.SetDirection(3);
-			} else if (Input.GetKey (KeyCode.LeftArrow)) {
-				//if(CanMove(pacmanObj,2))
-				PacCtrl.SetDirection(2);
-			} else if (Input.GetKey (KeyCode.RightArrow)) {
-				//if(CanMove(pacmanObj,4))
-				PacCtrl.SetDirection(4);
-			}
 			//cannot move forward 
-		if (Time.frameCount % 2 == 0) {
-			if (CanMove (pacmanObj, PacCtrl.CurDir) == false) {
-				//stop 
-				PacCtrl.SetDirection (5,Locator(pacmanObj));
-			}
-			// can turn in this pos
+		if (CanMove (pacmanObj, PacCtrl.CurDir) == false) {
+			//stop 
+			PacCtrl.SetDirection (5,Locator(pacmanObj));
+		}
+		// can turn in this pos
+		if (PacCtrl.WaitingDir != 5) {
 			if (CanMove (pacmanObj, PacCtrl.WaitingDir) == true) {
 				//turn
-				PacCtrl.SetDirection (5,Locator(pacmanObj));
-			}
+				PacCtrl.SetDirection (5, Locator (pacmanObj));
+			}		
 		}
 	}
 }

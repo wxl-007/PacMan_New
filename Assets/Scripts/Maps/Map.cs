@@ -52,7 +52,7 @@ public class Map : MonoBehaviour
 	GameObject mapObj = null;
 	GameObject mapPiece = null;
 	public Sprite[] mapSprites; 
-	public Sprite smallPoint,bigPoint;
+	public Sprite smallPoint,bigPoint,bigPoint1;
  
 	public int[,] mapArray{
 		get { return originalMap;}
@@ -79,11 +79,21 @@ public class Map : MonoBehaviour
 						tPiece.GetComponent<Image>().sprite = mapSprites [currentMap [i, j]];
 
 					} else if (currentMap [i, j] == -1) {
-						// small point 
+						// pac-dots 
 						tPiece.GetComponent<Image> ().sprite = smallPoint;
 					} else if (currentMap [i, j] == -2) {
+						// power pellet 
 						tPiece.GetComponent<Image> ().sprite = bigPoint;
+						SimpleAnimation tPowerBullet = tPiece.AddComponent<SimpleAnimation> ();
+						tPowerBullet.aniSprites = new Sprite[3]{bigPoint, bigPoint1,smallPoint};
+						tPowerBullet.playRat = 15;
+						tPowerBullet.isLoop = true;
+						tPowerBullet.isPingPang = true;
+						tPowerBullet.Play ();
+
+
 					} else if (currentMap [i, j] == -3) {
+						//empty road
 						tPiece.GetComponent<Image> ().sprite = mapSprites[46];
 					}
 				}
@@ -91,5 +101,16 @@ public class Map : MonoBehaviour
 			mapPiece.SetActive (false);
 		}
     }
+	//set piece sprite to normal  
+	public void SetDotsHide(int[,] pPos ){
+		string tDotName = "m_"+pPos[0,1]+"_"+pPos[0,0];
+		Image tDotsPiece = mapObj.transform.Find (tDotName).GetComponent<Image>();
+		if (tDotsPiece.gameObject.GetComponent<SimpleAnimation> ()) {
+			tDotsPiece.gameObject.GetComponent<SimpleAnimation> ().Stop ();
+		}
+		tDotsPiece.sprite = mapSprites [46];
+
+	}
+
     
 }
