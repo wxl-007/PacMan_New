@@ -30,6 +30,9 @@ public class SimpleAnimation : MonoBehaviour {
 	public void Pause(){
 		isPlay = false;
 	}
+	public void Countiue(){
+		isPlay = true;
+	}
 
 	public void Stop(){
 		isPlay = false;

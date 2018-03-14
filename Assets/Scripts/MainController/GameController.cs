@@ -18,6 +18,7 @@ public class GameController : MonoBehaviour {
 	Pacman PacCtrl; 
 	ScoreBoard scoreBoard;
 	Transform livesTran;
+	int canNotMoveDir = 0;
 
 
 	public void Init(Object pMainCtrl){
@@ -74,74 +75,119 @@ public class GameController : MonoBehaviour {
 		if (pObj == pacmanObj) {
 			EatPacDots (tPos);
 		}
+
+		//there is portal should be here
+		if (tPos [0, 1] == 14) {
+			if (tPos [0, 0] == 0 && pDirNum == 2) {
+				if (pacmanObj.transform.localPosition.x <= 0)
+					pacmanObj.transform.localPosition += Vector3.right * 1269;
+				return true;
+			} else if(tPos[0,0]>=25 && pDirNum ==4) {
+				if (pacmanObj.transform.localPosition.x > 1260)
+					pacmanObj.transform.localPosition -= Vector3.right*1260;
+				return true;
+			}
+		}
+
+
 		if (pDirNum == 1) {
 			//up  y-1 
-			if (mapArr [tPos [0, 1]-1, tPos [0, 0]] > 0)
+			if (mapArr [tPos [0, 1] - 1, tPos [0, 0]] > 0) {
+				canNotMoveDir=1;
 				return false;
-			else
+			} else {
+				canNotMoveDir=0;
 				return true;
+			}
 		} else if (pDirNum == 2) {
 			//left x-1
-			if (mapArr [tPos [0, 1], tPos [0, 0]-1] > 0)
+			if (mapArr [tPos [0, 1], tPos [0, 0] - 1] > 0) {
+				canNotMoveDir=2;
 				return false;
-			else
+			} else {
+				canNotMoveDir=0;
 				return true;
+			}
 		} else if (pDirNum == 3) {
 			//down y+1
-			if (mapArr [tPos [0, 1]+1, tPos [0, 0]] > 0)
+			if (mapArr [tPos [0, 1] + 1, tPos [0, 0]] > 0) {
+				canNotMoveDir=3;
 				return false;
-			else
+			} else {
+				canNotMoveDir=0;
 				return true;
+			}
 		} else if (pDirNum == 4) {
 			// right x+1
-			if(mapArr [tPos [0, 1] , tPos [0, 0]+1] > 0)
+			if (mapArr [tPos [0, 1], tPos [0, 0] + 1] > 0) {
+				canNotMoveDir=4;
 				return false;
-			else
+			} else {
+				canNotMoveDir=0;
 				return true;
+			}
 		}
 		return false;
 	}
-	//
+
+
 	void EatPacDots(int[,] pPos ){
 		
 		if (mapArr [pPos [0, 1], pPos [0, 0]] == -1) {
 			//eat pac-dots
 			// pac-dots = 10
 			CalculateScore (10);
+			m_Map.SetDotsHide (pPos);
+			mapArr [pPos [0, 1], pPos [0, 0]] = 0;
+
 		} else if (mapArr [pPos [0, 1], pPos [0, 0]] == -2) {
 			//power pellet
 			// super mode
 			PacCtrl.SetState (true);
 			CalculateScore (50);
+			m_Map.SetDotsHide (pPos);
+			mapArr [pPos [0, 1], pPos [0, 0]] = 0;
+		
 		}
-		mapArr [pPos [0, 1], pPos [0, 0]] = 0;
-		m_Map.SetDotsHide (pPos);
 	}
 
 
 	void FixedUpdate(){
+	//	Debug.Log ("can not move "+canNotMoveDir+ "cur dir "+ PacCtrl.CurDir);
 		if (Input.GetKey (KeyCode.UpArrow)) {
 			// up
-			PacCtrl.SetDirection (1);
+			if (canNotMoveDir != 1)
+				PacCtrl.SetDirection (1);
+			
 		} else if (Input.GetKey (KeyCode.DownArrow)) {
-			PacCtrl.SetDirection (3);
+			if (canNotMoveDir != 3 )
+				PacCtrl.SetDirection (3);
+			
 		} else if (Input.GetKey (KeyCode.LeftArrow)) {
-			PacCtrl.SetDirection (2);
+				if (canNotMoveDir != 2 )
+					PacCtrl.SetDirection (2);
+			
 		} else if (Input.GetKey (KeyCode.RightArrow)) {
-			PacCtrl.SetDirection (4);
+			if(canNotMoveDir != 4 )
+					PacCtrl.SetDirection (4);
 		}
 	}
 	void Update(){
 			//cannot move forward 
 		if (CanMove (pacmanObj, PacCtrl.CurDir) == false) {
-			//stop 
 			PacCtrl.SetDirection (5,Locator(pacmanObj));
+			if(PacCtrl.WaitingDir !=5){
+				if (CanMove (pacmanObj, PacCtrl.WaitingDir) == false)
+					PacCtrl.WaitingDir = 5;
+			}
+			return;
 		}
-		// can turn in this pos
+		// can turn in this pos any time 
 		if (PacCtrl.WaitingDir != 5) {
 			if (CanMove (pacmanObj, PacCtrl.WaitingDir) == true) {
-				//turn
 				PacCtrl.SetDirection (5, Locator (pacmanObj));
+			} else {
+				// if can not turn 
 			}		
 		}
 	}

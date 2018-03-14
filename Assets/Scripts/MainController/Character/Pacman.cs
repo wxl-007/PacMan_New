@@ -17,38 +17,41 @@ public class Pacman : MonoBehaviour {
 	public int CurDir {
 		get{ return (int)curDir;}
 	}
+	//controller can set next dir 
 	public int WaitingDir{
+		set{waitingDir = (Direction)value; }
 		get{ return (int)waitingDir;}
 	}
-	Direction lastDir = Direction.non;
+//	Direction lastDir = Direction.non;
 	float speed = 4f;
 
 	//is super or not 
 	bool curState;
 	int timer =1;
 	bool willStop;
-	bool willTurn;
 	int[,] stopPos;
-	int[,] turnPos;
 	public void Init(){
 		curDir = Direction.Left;
 		curState = false;
 		waitingDir = Direction.non;
+	//	lastDir = Direction.non;
 	}
 	public void SetDirection(int pDir,int[,] pPos = null ){
 		//stop first 
+
 		if (pDir == 5 && pPos!= null) {
 			willStop = true;
-			//curDir = Direction.non;
 			stopPos = pPos;
 			return;
 		}
-		if (Mathf.Abs ((int)curDir - pDir) != 2) {
+		if (pDir!=5&&  (int)CurDir - pDir == 0)
+			return;
+		if (Mathf.Abs ((int)curDir - pDir) != 2 ) {
 			// turn waiting list 
 			waitingDir = (Direction)pDir;
-
 		} else {
 			//directly change dont wait 
+		//	lastDir = curDir;
 			curDir = (Direction)pDir;
 			ChangeDirection ();
 		}
@@ -56,12 +59,12 @@ public class Pacman : MonoBehaviour {
 
 	// change statuss
 	public void SetState(bool pState){
-		Debug.Log ("change state");
 		curState = pState;
 	}
 
 	//change dir  
 	void ChangeDirection(){
+		this.gameObject.GetComponent<SimpleAnimation> ().Countiue ();
 		if (curDir == Direction.Up) {
 			this.transform.localEulerAngles = Vector3.back * 90f;
 		} else if (curDir == Direction.Left) {
@@ -70,6 +73,8 @@ public class Pacman : MonoBehaviour {
 			this.transform.localEulerAngles = Vector3.forward * 90;
 		} else if (curDir == Direction.Right) {
 			this.transform.localEulerAngles = Vector3.forward * 180;
+		} else if (curDir == Direction.non) {
+			this.gameObject.GetComponent<SimpleAnimation> ().Pause ();
 		}
 	}
 	/// <summary>
@@ -90,21 +95,24 @@ public class Pacman : MonoBehaviour {
 		} else if (curDir == Direction.Down) {
 			this.gameObject.transform.localPosition += Vector3.down * speed;
 		} else {
-			
+			// stop none
 		}
 	}
 	void Update(){
 		if (willStop == true) {
-			if (Vector3.Distance (this.gameObject.transform.localPosition, new Vector3 (stopPos [0, 0] * 47, stopPos [0, 1] * (-47), this.transform.localPosition.z)) < 8.0) {
+			if (Vector3.Distance (this.gameObject.transform.localPosition, new Vector3 (stopPos [0, 0] * 47, stopPos [0, 1] * (-47), this.transform.localPosition.z)) < 10.0) {
 				OffsetPos (stopPos);
 				willStop = false;
+				//lastDir = curDir;
 				curDir = Direction.non;
+				this.gameObject.GetComponent<SimpleAnimation> ().Pause ();
 				//turn to other dir 
 				if (waitingDir != Direction.non) {
 					//Debug.Log (waitingDir);
+				//	lastDir = curDir;
 					curDir = waitingDir;
-					ChangeDirection ();
 					waitingDir = Direction.non;
+					ChangeDirection ();
 				}
 			}
 		}
