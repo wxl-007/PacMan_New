@@ -47,7 +47,7 @@ public class GameController : MonoBehaviour {
 		pacmanObj.SetActive (true);
 		pacmanObj.transform.localEulerAngles = Vector3.zero;
 		pacmanObj.transform.localScale = Vector3.one;
-		pacmanObj.transform.localPosition = new Vector3(m_Map.bornPoint[1]*47,m_Map.bornPoint[0]*(-47),20)  ;
+		pacmanObj.transform.localPosition = new Vector3(m_Map.bornPoint[1]*47,m_Map.bornPoint[0]*(-47),-5)  ;
 		PacCtrl = pacmanObj.GetComponent<Pacman> ();
 		PacCtrl.Init ();
 	}

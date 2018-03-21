@@ -64,7 +64,7 @@ public class Pacman : MonoBehaviour {
 
 	//change dir  
 	void ChangeDirection(){
-		this.gameObject.GetComponent<SimpleAnimation> ().Countiue ();
+		this.gameObject.GetComponent<Animator>().enabled = true;
 		if (curDir == Direction.Up) {
 			this.transform.localEulerAngles = Vector3.back * 90f;
 		} else if (curDir == Direction.Left) {
@@ -81,7 +81,7 @@ public class Pacman : MonoBehaviour {
 	/// Offsets the position when pacman is changing the dir , it should be in the center of the corner 
 	/// </summary>
 	public void OffsetPos( int[,] pCurPos){
-		this.transform.localPosition = new Vector3 (pCurPos[0,0]*47,pCurPos[0,1]*(-47));
+		this.transform.localPosition = new Vector3 (pCurPos[0,0]*47,pCurPos[0,1]*(-47),-5);
 	}
 
 	void FixedUpdate(){
@@ -100,12 +100,13 @@ public class Pacman : MonoBehaviour {
 	}
 	void Update(){
 		if (willStop == true) {
-			if (Vector3.Distance (this.gameObject.transform.localPosition, new Vector3 (stopPos [0, 0] * 47, stopPos [0, 1] * (-47), this.transform.localPosition.z)) < 10.0) {
+			if (Vector3.Distance (this.gameObject.transform.localPosition, new Vector3 (stopPos [0, 0] * 47, stopPos [0, 1] * (-47), -5)) < 10.0) {
 				OffsetPos (stopPos);
 				willStop = false;
 				//lastDir = curDir;
 				curDir = Direction.non;
-				this.gameObject.GetComponent<SimpleAnimation> ().Pause ();
+				this.gameObject.GetComponent<Animator>().enabled= false;
+
 				//turn to other dir 
 				if (waitingDir != Direction.non) {
 					//Debug.Log (waitingDir);

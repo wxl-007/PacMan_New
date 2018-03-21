@@ -1,10 +1,12 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\MainController\GameController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\MainController\Character\Pacman.cs">
     <Files>
-      <File FileName="Assets\Scripts\MainController\GameController.cs" Line="86" Column="50" />
-      <File FileName="Assets\Scripts\MainController\Character\Pacman.cs" Line="76" Column="40" />
-      <File FileName="Assets\Scripts\Maps\Map.cs" Line="111" Column="39" />
+      <File FileName="Assets\Scripts\MainController\GameController.cs" Line="50" Column="100" />
+      <File FileName="Assets\Scripts\MainController\Character\Pacman.cs" Line="108" Column="1" />
+      <File FileName="Assets\Scripts\Maps\Map.cs" Line="119" Column="11" />
+      <File FileName="Assets\Scripts\Utilities\SimpleAnimation.cs" Line="44" Column="39" />
+      <File FileName="Assets\Scripts\MainController\Menu\UIController.cs" Line="38" Column="34" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -13,9 +15,10 @@
             <Node name="Assembly-CSharp" expanded="True">
               <Node name="Scripts" expanded="True">
                 <Node name="MainController" expanded="True">
-                  <Node name="Character" expanded="True" />
+                  <Node name="Character" expanded="True">
+                    <Node name="Pacman.cs" selected="True" />
+                  </Node>
                   <Node name="Menu" expanded="True" />
-                  <Node name="GameController.cs" selected="True" />
                 </Node>
                 <Node name="Maps" expanded="True" />
                 <Node name="Utilities" expanded="True" />
