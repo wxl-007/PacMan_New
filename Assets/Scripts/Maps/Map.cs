@@ -27,7 +27,7 @@ public class Map : MonoBehaviour
         {21,28,28,28,28, 6,-1, 8,41, 5, 5, 6,-3, 8, 9,-3, 7, 5, 5,10, 9,-1, 7,28,28,28,28,20},
         {46,46,46,46,46,19,-1, 8,39,31,31,40,-3,11,10,-3,41,31,31, 6, 9,-1,18,46,46,46,46,46},
         {46,46,46,46,46,19,-1, 8, 9,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3, 8, 9,-1,18,46,46,46,46,46},
-        {46,46,46,46,46,19,-1, 8, 9,-3,13,29,29,29,29,29,29,12,-3, 8, 9,-1,18,46,46,46,46,46},
+        {46,46,46,46,46,19,-1, 8, 9,-3,13,29,30,30,30,30,29,12,-3, 8, 9,-1,18,46,46,46,46,46},
         {27,27,27,27,27,40,-1,11,10,-3,18,46,46,46,46,46,46,19,-3,11,10,-1,41,27,27,27,27,27},
         {-3,-3,-3,-3,-3,-3,-1,-3,-3,-3,18,46,46,46,46,46,46,19,-3,-3,-3,-1,-3,-3,-3,-3,-3,-3},
         {28,28,28,28,28, 6,-1, 7, 6,-3,18,46,46,46,46,46,46,19,-3, 7, 6,-1, 7,28,28,28,28,28},
@@ -89,16 +89,6 @@ public class Map : MonoBehaviour
 						tPiece.GetComponent<SpriteRenderer> ().size = Vector2.one * 47;
 						Animator tPowerBullet = tPiece.AddComponent<Animator> ();
 						tPowerBullet.runtimeAnimatorController = energier;
-					
-					
-						/*
-						SimpleAnimation tPowerBullet = tPiece.AddComponent<SimpleAnimation> ();
-						tPowerBullet.aniSprites = new Sprite[3]{bigPoint, bigPoint1,smallPoint};
-						tPowerBullet.playRat = 15;
-						tPowerBullet.isLoop = true;
-						tPowerBullet.isPingPang = true;
-						tPowerBullet.Play ();
-					*/
 
 					} else if (currentMap [i, j] == -3) {
 						//empty road
