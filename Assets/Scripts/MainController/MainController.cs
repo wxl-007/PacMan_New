@@ -29,10 +29,13 @@ public class MainController : MonoBehaviour {
 		m_UIPanelController.Init (this);
 		m_GameController.Init (this);
 	}
-	public void HideMenu(){
-		m_UIPanelController.gameObject.SetActive (false);
+	public void HideMenu(bool pBool){
+		m_UIPanelController.gameObject.SetActive (pBool);
 	}
 
+	public void BackToUIPanel(){
+		m_GameController.gameObject.SetActive (false);
+	}
 
 
 }

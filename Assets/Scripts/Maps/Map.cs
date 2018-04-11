@@ -13,7 +13,9 @@ public class Map : MonoBehaviour
      const int m_column = 28, m_row = 31; 
 	 [HideInInspector] 
 	 public int[] bornPoint = {23,14};  
-     int[,] originalMap = new int[31, 28] {
+	[HideInInspector]
+	public int[] enimyBornPos = {11,14};
+	int[,] originalMap = new int[m_row, m_column] {
        // 1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8 
         {17,26,26,26,26,26,26,26,26,26,26,26,26,43,42,26,26,26,26,26,26,26,26,26,26,26,26,16},
         {19,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 9, 8,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,18},
@@ -54,7 +56,7 @@ public class Map : MonoBehaviour
 	public Sprite[] mapSprites; 
 	public Sprite smallPoint,bigPoint,bigPoint1;
 	public RuntimeAnimatorController energier;
-	public int[,] mapArray{
+	public int[,] mapArray{ 
 		get { return originalMap;}
 	}
 
@@ -109,8 +111,16 @@ public class Map : MonoBehaviour
 			return;
 		}
 		tDotsPiece.sprite = mapSprites [46];
+	}
+	public void ClearMap(){
+		int tNum = mapObj.transform.childCount;
+		for (int i = 0; i <tNum ; i++) {
+			if(mapObj.transform.GetChild(i).gameObject.Equals(mapPiece)==false)
+				if(mapObj.transform.GetChild(i).gameObject.name!="PacMan" && mapObj.transform.GetChild(i).gameObject.name!="Red") 
+					Destroy (mapObj.transform.GetChild(i).gameObject);
+			
+		}
+		currentMap = null;
 
 	}
-
-    
 }

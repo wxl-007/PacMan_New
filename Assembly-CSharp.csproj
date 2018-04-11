@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\MainController\Character\AI\IEnemyBehaviour.cs" />
+     <Compile Include="Assets\Scripts\MainController\Character\AI\Red.cs" />
      <Compile Include="Assets\Scripts\MainController\Character\Pacman.cs" />
      <Compile Include="Assets\Scripts\MainController\GameController.cs" />
      <Compile Include="Assets\Scripts\MainController\MainController.cs" />

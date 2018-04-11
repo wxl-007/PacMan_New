@@ -35,8 +35,8 @@ public class UIController : MonoBehaviour {
 
 	void InitGame(){
 		m_MainCtrl.GetGameCtrl.gameObject.SetActive (true);
-		m_MainCtrl.GetGameCtrl.InitGame ();
-		m_MainCtrl.HideMenu ();
+		m_MainCtrl.GetGameCtrl.InitGame();
+		m_MainCtrl.HideMenu (false);
 	}
 	void OnControlClick(){
 		Debug.Log ("click ctrl btn");

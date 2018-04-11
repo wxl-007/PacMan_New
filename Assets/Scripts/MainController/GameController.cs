@@ -14,33 +14,81 @@ public class GameController : MonoBehaviour {
 	int[,] mapArr;
 	int timer =0;
 	//[HideInInspector]
+	public GameObject pacLive;
 	public GameObject pacmanObj;
+	public GameObject banerReady;
 	Pacman PacCtrl; 
 	ScoreBoard scoreBoard;
 	Transform livesTran;
 	int canNotMoveDir = 0;
-
-
+	public GameObject redObj;
+	Red RedCtrl; 
+	Transform gameOverObj;
+	[HideInInspector]
+	bool realStart= false;
 	public void Init(Object pMainCtrl){
 		m_MainObj = (MainController)pMainCtrl;
 		m_Map = this.transform.Find ("Panel/MapParentObj").GetComponent<Map>();
 		scoreBoard = this.transform.Find ("Panel/Img_Score").GetComponent<ScoreBoard> ();
 		livesTran = this.transform.Find ("Panel/Img_Lives");
+		gameOverObj = this.transform.Find ("Panel/GameOver");
+
 	}
+	public IEnumerator InitAll(){
+		banerReady.gameObject.SetActive (true);
+		//init map
+		m_Map.InitMap ();
+		yield return new WaitForSeconds (3);
+		banerReady.gameObject.SetActive (false);
 
-
-	// init game 
-	public void InitGame(){
-		// init data
 		curLiveNum = m_InitialLives;
 		curLevel = 1;
 		curScore = 0;
-		//init map
-		m_Map.InitMap ();
-		mapArr = m_Map.mapArray;
+		mapArr = (int[,]) m_Map.mapArray.Clone();
+		Debug.Log ("map :"+m_Map.mapArray.GetLength(0));
+		//mapArr = new int[,]{m_Map.mapArray};
 		InitPacman ();
+		InitEnemy ();
+		InitLives ();
+		realStart = true;
+		PacCtrl.SetStart (true);
+		RedCtrl.SetStart (true);
+		gameOverObj.gameObject.SetActive (false);
+	}
+	// init game 
+	public void InitGame(){
+		// init data
+		StartCoroutine(InitAll());
+
 	}
 
+	void InitLives(){
+		int tNum = livesTran.childCount;
+		if (tNum >0) {
+			for (int i = 0; i < tNum; i++) {
+				if (pacLive.Equals (livesTran.GetChild (i)) == false)
+					GameObject.Destroy (livesTran.GetChild (i).gameObject);
+			}
+		}
+		for (int i = 0; i < curLiveNum; i++) {
+			GameObject tLife = GameObject.Instantiate (pacLive,livesTran);
+			tLife.SetActive (true);
+			tLife.transform.localScale = Vector3.one;
+			tLife.transform.localPosition= new Vector3(-70+100*i,-115,1);
+		}
+	}
+	IEnumerator RestartGame(){
+		banerReady.gameObject.SetActive (true);
+		yield return new WaitForSeconds (3);
+		banerReady.gameObject.SetActive (false);
+		InitLives ();
+		InitPacman ();
+		InitEnemy ();
+		realStart = true;
+		PacCtrl.SetStart (true);
+		RedCtrl.SetStart (true);
+		gameOverObj.gameObject.SetActive (false);
+	}
 	// init PacMan 
 	void InitPacman(){
 		pacmanObj.transform.SetParent ( m_Map.transform); 
@@ -50,6 +98,16 @@ public class GameController : MonoBehaviour {
 		pacmanObj.transform.localPosition = new Vector3(m_Map.bornPoint[1]*47,m_Map.bornPoint[0]*(-47),-5)  ;
 		PacCtrl = pacmanObj.GetComponent<Pacman> ();
 		PacCtrl.Init ();
+	}
+
+	void InitEnemy(){
+		redObj.transform.SetParent (m_Map.transform);
+		redObj.SetActive (true);
+		redObj.transform.localEulerAngles = Vector3.zero;
+		redObj.transform.localScale = Vector3.one;
+		redObj.transform.localPosition = new Vector3 (m_Map.enimyBornPos[1]*47,m_Map.enimyBornPos[0]*(-47),-5);
+		RedCtrl = redObj.GetComponent<Red> ();
+		RedCtrl.Init ();
 	}
 	// count the score  
 	void CalculateScore(int pScore){
@@ -79,12 +137,12 @@ public class GameController : MonoBehaviour {
 		//there is portal should be here
 		if (tPos [0, 1] == 14) {
 			if (tPos [0, 0] == 0 && pDirNum == 2) {
-				if (pacmanObj.transform.localPosition.x <= 0)
-					pacmanObj.transform.localPosition += Vector3.right * 1269;
+				if (pObj.transform.localPosition.x <= 0)
+					pObj.transform.localPosition += Vector3.right * 1269;
 				return true;
 			} else if(tPos[0,0]>=25 && pDirNum ==4) {
-				if (pacmanObj.transform.localPosition.x > 1260)
-					pacmanObj.transform.localPosition -= Vector3.right*1260;
+				if (pObj.transform.localPosition.x > 1260)
+					pObj.transform.localPosition -= Vector3.right*1260;
 				return true;
 			}
 		}
@@ -147,12 +205,25 @@ public class GameController : MonoBehaviour {
 			CalculateScore (50);
 			m_Map.SetDotsHide (pPos);
 			mapArr [pPos [0, 1], pPos [0, 0]] = 0;
-		
+			RedCtrl.SetState (3);
+			StopCoroutine ("CountFrightened");
+			StartCoroutine ("CountFrightened");
 		}
 	}
 
+	IEnumerator CountFrightened(){
+		yield return new WaitForSeconds(10);
+		RedCtrl.SetState (1);
+	}
 
+	IEnumerator RebornEnemy(){
+		redObj.SetActive (false);
+		yield return new WaitForSeconds(7);
+		InitEnemy ();
+	}
 	void FixedUpdate(){
+		if (realStart == false)
+			return;
 	//	Debug.Log ("can not move "+canNotMoveDir+ "cur dir "+ PacCtrl.CurDir);
 		if (Input.GetKey (KeyCode.UpArrow)) {
 			// up
@@ -172,7 +243,65 @@ public class GameController : MonoBehaviour {
 					PacCtrl.SetDirection (4);
 		}
 	}
+	void BackToMainMenu(){
+		m_MainObj.HideMenu (true);
+		pacmanObj.SetActive(false);
+		redObj.SetActive(false);
+		pacmanObj.transform.SetParent (m_Map.transform);
+		redObj.transform.SetParent (m_Map.transform);
+		m_MainObj.BackToUIPanel ();
+		mapArr = null;
+		m_Map.ClearMap ();
+	}
 	void Update(){
+		if (realStart == false)
+			return;
+		if (Vector2.Distance (redObj.transform.localPosition, pacmanObj.transform.localPosition) < 40) {
+			if (RedCtrl.curMode == 3) {
+				CalculateScore (200);
+				StartCoroutine ("RebornEnemy");
+			} else {
+				realStart = false;
+				PacCtrl.SetStart (false);
+				RedCtrl.SetStart (false);
+				curLiveNum--;
+				if (curLiveNum == -1) {
+					gameOverObj.gameObject.SetActive (true);
+					Invoke ("BackToMainMenu", 3);
+				} else {
+					StartCoroutine(RestartGame ());
+				}
+			}
+		}
+		if (CanMove (redObj,RedCtrl.curDir) == false) {
+			int tDir;
+			if (RedCtrl.curDir == 1 || RedCtrl.curDir == 3) {
+				if(RedCtrl.curMode!=3)
+					tDir = (redObj.transform.localPosition.x <= pacmanObj.transform.localPosition.x) ? 4 : 2;
+				else
+					tDir = (redObj.transform.localPosition.x <= pacmanObj.transform.localPosition.x) ? 2 : 4;
+				if (CanMove (redObj, tDir) == false){
+					if (tDir == 2)
+						tDir = 4;
+					else
+						tDir = 2;
+				}
+					RedCtrl.ChangeDirection (tDir, Locator (redObj));
+			} else {
+				if(RedCtrl.curMode!=3)
+					tDir = (redObj.transform.localPosition.y <= pacmanObj.transform.localPosition.y) ? 1 : 3;
+				else
+					tDir = (redObj.transform.localPosition.y <= pacmanObj.transform.localPosition.y) ? 3 : 1;
+
+				if (CanMove (redObj, tDir) == false) {
+					if (tDir == 1)
+						tDir = 3;
+					else
+						tDir = 1;
+				}
+				RedCtrl.ChangeDirection (tDir, Locator (redObj));
+			}
+		}
 			//cannot move forward 
 		if (CanMove (pacmanObj, PacCtrl.CurDir) == false) {
 			PacCtrl.SetDirection (5,Locator(pacmanObj));
@@ -182,6 +311,7 @@ public class GameController : MonoBehaviour {
 			}
 			return;
 		}
+
 		// can turn in this pos any time 
 		if (PacCtrl.WaitingDir != 5) {
 			if (CanMove (pacmanObj, PacCtrl.WaitingDir) == true) {

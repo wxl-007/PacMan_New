@@ -23,13 +23,14 @@ public class Pacman : MonoBehaviour {
 		get{ return (int)waitingDir;}
 	}
 //	Direction lastDir = Direction.non;
-	float speed = 4f;
+	float speed = 5f;
 
 	//is super or not 
 	bool curState;
 	int timer =1;
 	bool willStop;
 	int[,] stopPos;
+	bool realStart = false;
 	public void Init(){
 		curDir = Direction.Left;
 		curState = false;
@@ -57,6 +58,9 @@ public class Pacman : MonoBehaviour {
 		}
 	}
 
+	public void SetStart (bool pBool){
+		realStart = pBool;
+	}
 	// change statuss
 	public void SetState(bool pState){
 		curState = pState;
@@ -85,6 +89,8 @@ public class Pacman : MonoBehaviour {
 	}
 
 	void FixedUpdate(){
+		if (realStart == false)
+			return;
 		//timer += Time.deltaTime;
 		if (curDir == Direction.Left) {
 			this.gameObject.transform.localPosition += Vector3.left * speed;
@@ -103,7 +109,6 @@ public class Pacman : MonoBehaviour {
 			if (Vector3.Distance (this.gameObject.transform.localPosition, new Vector3 (stopPos [0, 0] * 47, stopPos [0, 1] * (-47), -5)) < 10.0) {
 				OffsetPos (stopPos);
 				willStop = false;
-				//lastDir = curDir;
 				curDir = Direction.non;
 				this.gameObject.GetComponent<Animator>().enabled= false;
 
